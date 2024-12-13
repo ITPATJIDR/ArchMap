@@ -2,7 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod create_infra;
-mod rusible;
 mod utils;
 mod templates;
 

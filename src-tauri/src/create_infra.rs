@@ -39,7 +39,7 @@ pub fn check_service(service: Vec<Service>, path: Vec<String>) -> Result<String,
     for item in &service {
         match manager.find_playbook(&item.service_type) {
             Some(playbook_path) => {
-                let new_project_path = format!("{}/{}", new_dir, item.label);
+                let new_project_path = format!(" dirpath={} project_name={}", new_dir, item.label.to_lowercase() );
                 run_ansible_command(playbook_path.clone(), Some(new_project_path));
             }
             None => println!("Playbook for 'check_dir' not found."),

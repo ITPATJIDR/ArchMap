@@ -1,47 +1,40 @@
 ---
-- name: Manage React Projects
+- name: React Project Automation
   hosts: localhost
   gather_facts: no
-
   vars:
-    react_projects: []  # List of directories for React projects, populated via extra_vars
+    dirpath: "{{ dirpath }}"
+    project_name: "{{ project_name }}"
 
   tasks:
-
-    - name: Validate input
-      fail:
-        msg: "No projects specified. Use --extra-vars to pass 'react_projects'."
-      when: react_projects | length == 0
-
-    - name: Ensure each project directory exists
-      file:
-        path: "{{ item }}"
-        state: directory
-        mode: '0755'
-      with_items: "{{ react_projects }}"
-
-    - name: Check if React projects already exist
+    - name: Check if directory path exists
       stat:
-        path: "{{ item }}/package.json"
-      register: react_projects_status
-      with_items: "{{ react_projects }}"
+        path: "{{ dirpath }}"
+      register: dir_check
 
-    - name: Report existing React projects
-      debug:
-        msg: "React project already exists at {{ item.item }}"
-      with_items: "{{ react_projects_status.results }}"
-      when: item.stat.exists
+    - name: Create directory path if not exists
+      file:
+        path: "{{ dirpath }}"
+        state: directory
+      when: dir_check.stat.exists == false
 
-    - name: Create React projects where missing
-      command: npx create-react-app {{ item | basename }}
+    - name: Check if the React project exists
+      stat:
+        path: "{{ dirpath }}/{{ project_name }}"
+      register: project_check
+
+    - name: Create React project if it doesn't exist
+      command: npx create-react-app {{ dirpath }}/{{ project_name }}
+      when: project_check.stat.exists == false
       args:
-        chdir: "{{ item | dirname }}"
-      with_items: "{{ react_projects }}"
-      when: not item.stat.exists
-      register: create_react_projects
+        creates: "{{ dirpath }}/{{ project_name }}/package.json"
 
-    - name: Report React project creation status
+    - name: Output project creation status
       debug:
-        msg: "Created React project at {{ item.item }}"
-      with_items: "{{ create_react_projects.results }}"
-      when: item.rc == 0
+        msg: "React project {{ project_name }} is created at {{ dirpath }}"
+      when: project_check.stat.exists == false
+
+    - name: Output message if project exists
+      debug:
+        msg: "React project {{ project_name }} already exists at {{ dirpath }}"
+      when: project_check.stat.exists == true
