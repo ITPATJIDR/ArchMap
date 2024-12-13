@@ -1,0 +1,51 @@
+service_templates:
+  prerequisites:
+    - step:
+      name: "Check Node"
+      command: "node -v"
+      note: "Please install Node before running"
+    - step:
+      name: "Check NPM"
+      command: "npm -version"
+      note: "Please install Node before running"
+
+  install_prerequisites:
+    - step:
+      name: "Install Node"
+      command: "sudo dnf module install nodejs:16"
+      note: "Installing Node..."
+
+  setup_service:
+    - step:
+      name: "Create a new directory for your Express app"
+      command: "mkdir my-express-app && cd my-express-app"
+      note: "Create project directory."
+    - step:
+      name: "Navigate to your Express app"
+      command: "cd my-express-app"
+      note: "Navigate project directory."
+    - step:
+      name: "Initialize a new Node.js project"
+      command: "npm init -y"
+      note: "Generate a package.json file with default settings."
+    - step:
+      name: "Install Express"
+      command: "npm install express"
+      note: "Install the Express framework."
+    - step:
+      name: "Create an index.js file manually"
+      command: "touch index.js"
+      note: "Create the main file for your Express server."
+    - step:
+      name: "Write Express server code into index.js"
+      command: |
+        cat <<EOF > index.js
+        const express = require('express');
+        const app = express();
+        const port = 3000;
+
+        app.get('/', (req, res) => res.send('Hello, World!'));
+
+        app.listen(port, () => console.log('Server running on http://localhost:' + port));
+        EOF
+      note: "Write a basic Express server in index.js."

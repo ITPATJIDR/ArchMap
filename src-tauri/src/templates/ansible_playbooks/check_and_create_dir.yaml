@@ -1,0 +1,10 @@
+- name: Check if directory exists and create if not
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Ensure the directory exists
+      ansible.builtin.file:
+        path: "{{ directory_path}}" 
+        state: directory
+      vars:
+        directory_path: "{{ directory_path }}"

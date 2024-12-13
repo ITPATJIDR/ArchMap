@@ -1,0 +1,47 @@
+---
+- name: Manage React Projects
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    react_projects: []  # List of directories for React projects, populated via extra_vars
+
+  tasks:
+
+    - name: Validate input
+      fail:
+        msg: "No projects specified. Use --extra-vars to pass 'react_projects'."
+      when: react_projects | length == 0
+
+    - name: Ensure each project directory exists
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      with_items: "{{ react_projects }}"
+
+    - name: Check if React projects already exist
+      stat:
+        path: "{{ item }}/package.json"
+      register: react_projects_status
+      with_items: "{{ react_projects }}"
+
+    - name: Report existing React projects
+      debug:
+        msg: "React project already exists at {{ item.item }}"
+      with_items: "{{ react_projects_status.results }}"
+      when: item.stat.exists
+
+    - name: Create React projects where missing
+      command: npx create-react-app {{ item | basename }}
+      args:
+        chdir: "{{ item | dirname }}"
+      with_items: "{{ react_projects }}"
+      when: not item.stat.exists
+      register: create_react_projects
+
+    - name: Report React project creation status
+      debug:
+        msg: "Created React project at {{ item.item }}"
+      with_items: "{{ create_react_projects.results }}"
+      when: item.rc == 0
