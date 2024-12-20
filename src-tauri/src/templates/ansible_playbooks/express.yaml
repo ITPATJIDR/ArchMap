@@ -1,51 +1,65 @@
-service_templates:
-  prerequisites:
-    - step:
-      name: "Check Node"
-      command: "node -v"
-      note: "Please install Node before running"
-    - step:
-      name: "Check NPM"
-      command: "npm -version"
-      note: "Please install Node before running"
+---
+- name: Express Project Automation
+  hosts: localhost
+  gather_facts: no
+  vars:
+    dirpath: "{{ dirpath }}"
+    project_name: "{{ project_name }}"
 
-  install_prerequisites:
-    - step:
-      name: "Install Node"
-      command: "sudo dnf module install nodejs:16"
-      note: "Installing Node..."
+  tasks:
+    - name: Check if directory path exists
+      stat:
+        path: "{{ dirpath }}"
+      register: dir_check
 
-  setup_service:
-    - step:
-      name: "Create a new directory for your Express app"
-      command: "mkdir my-express-app && cd my-express-app"
-      note: "Create project directory."
-    - step:
-      name: "Navigate to your Express app"
-      command: "cd my-express-app"
-      note: "Navigate project directory."
-    - step:
-      name: "Initialize a new Node.js project"
-      command: "npm init -y"
-      note: "Generate a package.json file with default settings."
-    - step:
-      name: "Install Express"
-      command: "npm install express"
-      note: "Install the Express framework."
-    - step:
-      name: "Create an index.js file manually"
-      command: "touch index.js"
-      note: "Create the main file for your Express server."
-    - step:
-      name: "Write Express server code into index.js"
-      command: |
-        cat <<EOF > index.js
-        const express = require('express');
-        const app = express();
-        const port = 3000;
+    - name: Create directory path if not exists
+      file:
+        path: "{{ dirpath }}"
+        state: directory
+      when: dir_check.stat.exists == false
 
-        app.get('/', (req, res) => res.send('Hello, World!'));
+    - name: Check if the Express project exists
+      stat:
+        path: "{{ dirpath }}/{{ project_name }}"
+      register: project_check
 
-        app.listen(port, () => console.log('Server running on http://localhost:' + port));
-        EOF
-      note: "Write a basic Express server in index.js."
+    - name: Create Express project directory if it doesn't exist
+      file:
+        path: "{{ dirpath }}/{{ project_name }}"
+        state: directory
+      when: project_check.stat.exists == false
+
+    - name: Initialize npm project
+      command: npm init -y
+      args:
+        chdir: "{{ dirpath }}/{{ project_name }}"
+      when: project_check.stat.exists == false
+
+    - name: Install Express.js
+      command: npm install express
+      args:
+        chdir: "{{ dirpath }}/{{ project_name }}"
+      when: project_check.stat.exists == false
+
+    - name: Write Express server code into index.js
+      copy:
+        dest: "{{ dirpath }}/{{ project_name }}/index.js"
+        content: |
+          const express = require('express');
+          const app = express();
+          const port = 3000;
+
+          app.get('/', (req, res) => res.send('Hello, World!'));
+
+          app.listen(port, () => console.log('Server running on http://localhost:' + port));
+      when: project_check.stat.exists == false
+
+    - name: Output project creation status
+      debug:
+        msg: "Express project {{ project_name }} is created at {{ dirpath }}"
+      when: project_check.stat.exists == false
+
+    - name: Output message if project exists
+      debug:
+        msg: "Express project {{ project_name }} already exists at {{ dirpath }}"
+      when: project_check.stat.exists == true

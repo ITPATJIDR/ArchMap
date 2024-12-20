@@ -1,0 +1,165 @@
+{
+    "jenkins": {
+        "image": "jenkins/jenkins:lts",
+        "ports": ["8080:8080", "50000:50000"],
+        "volumes": ["/var/jenkins_home"]
+    },
+    "sonarqube": {
+        "image": "sonarqube",
+        "ports": ["9000:9000"],
+        "environment": [
+            "SONAR_JDBC_URL=jdbc:postgresql://db:5432/sonar",
+            "SONAR_JDBC_USERNAME=sonar",
+            "SONAR_JDBC_PASSWORD=sonar"
+        ],
+        "volumes": ["sonarqube_data:/opt/sonarqube/data"]
+    },
+    "owasp_zap": {
+        "image": "owasp/zap2docker-stable",
+        "ports": ["8081:8080"],
+        "command": ["zap.sh", "-daemon", "-port", "8080"]
+    },
+    "gitlab": {
+        "image": "gitlab/gitlab-ce:latest",
+        "ports": ["443:443", "80:80", "22:22"],
+        "environment": [
+            "GITLAB_OMNIBUS_CONFIG=external_url 'http://gitlab.example.com'"
+        ],
+        "volumes": [
+            "/srv/gitlab/config",
+            "/srv/gitlab/data",
+            "/srv/gitlab/logs"
+        ]
+    },
+    "trivy": {
+        "image": "aquasec/trivy",
+        "command": ["trivy", "--no-progress", "image", "my_image"]
+    },
+    "harbor": {
+        "image": "goharbor/harbor-core",
+        "ports": ["80:8080", "443:8443"],
+        "environment": [
+            "HARBOR_HOSTNAME=harbor.example.com",
+            "DB_PASSWORD=harbor_db_password"
+        ],
+        "volumes": [
+            "harbor_data:/data"
+        ]
+    },
+    "kics": {
+        "image": "checkmarx/kics",
+        "command": ["kics", "scan", "-p", "./project"]
+    },
+    "nginx": {
+        "image": "nginx",
+        "ports": ["80:80", "443:443"],
+        "volumes": [
+            "./nginx.conf:/etc/nginx/nginx.conf"
+        ]
+    },
+    "redis": {
+        "image": "redis",
+        "ports": ["6379:6379"]
+    },
+    "mysql": {
+        "image": "mysql:5.7",
+        "environment": [
+            "MYSQL_ROOT_PASSWORD=root_password",
+            "MYSQL_DATABASE=my_database"
+        ],
+        "ports": ["3306:3306"]
+    },
+    "postgresql": {
+        "image": "postgres:latest",
+        "environment": [
+            "POSTGRES_USER=user",
+            "POSTGRES_PASSWORD=password",
+            "POSTGRES_DB=my_database"
+        ],
+        "ports": ["5432:5432"]
+    },
+    "mongodb": {
+        "image": "mongo:latest",
+        "ports": ["27017:27017"]
+    },
+    "elasticsearch": {
+        "image": "docker.elastic.co/elasticsearch/elasticsearch:7.10.0",
+        "ports": ["9200:9200", "9300:9300"],
+        "environment": [
+            "discovery.type=single-node"
+        ]
+    },
+    "kibana": {
+        "image": "docker.elastic.co/kibana/kibana:7.10.0",
+        "ports": ["5601:5601"],
+        "depends_on": ["elasticsearch"]
+    },
+    "prometheus": {
+        "image": "prom/prometheus",
+        "ports": ["9090:9090"],
+        "volumes": [
+            "prometheus_data:/prometheus"
+        ]
+    },
+    "grafana": {
+        "image": "grafana/grafana",
+        "ports": ["3000:3000"],
+        "depends_on": ["prometheus"]
+    },
+    "mongodb_express": {
+        "image": "mongoclient/mongoclient",
+        "ports": ["8081:8081"],
+        "environment": [
+            "DB_URI=mongodb://mongo:27017"
+        ]
+    },
+    "apache": {
+        "image": "httpd:latest",
+        "ports": ["80:80", "443:443"],
+        "volumes": [
+            "./public-html:/usr/local/apache2/htdocs/"
+        ]
+    },
+    "wordpress": {
+        "image": "wordpress:latest",
+        "ports": ["8080:80"],
+        "environment": [
+            "WORDPRESS_DB_HOST=postgres:5432",
+            "WORDPRESS_DB_NAME=wordpress",
+            "WORDPRESS_DB_USER=user",
+            "WORDPRESS_DB_PASSWORD=password"
+        ],
+        "depends_on": ["postgresql"]
+    },
+    "phpmyadmin": {
+        "image": "phpmyadmin/phpmyadmin",
+        "ports": ["8081:80"],
+        "environment": [
+            "PMA_HOST=mysql",
+            "PMA_USER=root",
+            "PMA_PASSWORD=root_password"
+        ],
+        "depends_on": ["mysql"]
+    },
+    "portainer": {
+        "image": "portainer/portainer-ce",
+        "ports": ["9000:9000"],
+        "volumes": [
+            "/var/run/docker.sock:/var/run/docker.sock"
+        ]
+    },
+    "nginx_proxy": {
+        "image": "jwilder/nginx-proxy",
+        "ports": ["80:80", "443:443"],
+        "volumes": [
+            "/var/run/docker.sock:/tmp/docker.sock:ro"
+        ]
+    },
+    "traefik": {
+        "image": "traefik:v2.5",
+        "ports": ["80:80", "443:443"],
+        "volumes": [
+            "/var/run/docker.sock:/var/run/docker.sock"
+        ]
+    }
+}

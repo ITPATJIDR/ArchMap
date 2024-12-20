@@ -12,6 +12,7 @@ interface TopBarProps {
 
 interface NodeData {
   label: string | unknown
+  name: string | unknown
   service_type: string | unknown
 }
 
@@ -31,6 +32,7 @@ const TopNavbar: React.FC<TopBarProps> = ({nodes}) => {
     const extract_service = (nodes.map((item: Node) => {
         const new_data: NodeData = {
             label: item.data.label,
+            name: item.data.name,
             service_type: item.data.service_type,
         }
         return new_data

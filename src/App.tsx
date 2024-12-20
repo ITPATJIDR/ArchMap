@@ -16,6 +16,8 @@ import {
   ReactFlowProvider,
 } from '@xyflow/react';
 import "./App.css"
+import LeftBar from './components/LeftBar';
+import { invoke } from '@tauri-apps/api/tauri';
 
 const App: React.FC = () => {
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -38,14 +40,50 @@ const App: React.FC = () => {
     [setEdges]
   );
 
-  const addNode = (image: string, name:string) => {
-    const newNode: Node = {
-      id: (nodes.length + 1).toString(),
-      type: 'imageNode', // Set the node type to custom node type
-      position: { x: Math.random() * 250, y: Math.random() * 250 },
-      data: { label: `${name}_${nodes.length + 1}`, image, service_type: name }, // Pass the image URL
-    };
-    setNodes((nds) => [...nds, newNode]);
+  const addNode = async (image: string, name:string, service: string) => {
+    const result = await invoke<string>('get_docker_config_by_name', {
+      serviceName: name
+    });
+
+    if (service === 'docker-compose' ) {
+      const newNode: Node = {
+        id: (nodes.length + 1).toString(),
+        type: 'imageNode', // Set the node type to custom node type
+        position: { x: Math.random() * 250, y: Math.random() * 250 },
+        data: {
+          label: `${name}_${nodes.length + 1}`,
+          image,
+          name: name,
+          service_type: service,
+          config: JSON.parse(result)
+        }, // Pass the image URL
+      };
+      setNodes((nds) => [...nds, newNode]);
+    }else {
+      const newNode: Node = {
+        id: (nodes.length + 1).toString(),
+        type: 'imageNode', // Set the node type to custom node type
+        position: { x: Math.random() * 250, y: Math.random() * 250 },
+        data: {
+          label: `${name}_${nodes.length + 1}`,
+          image,
+          name: name,
+          service_type: service,
+        }, 
+      };
+      setNodes((nds) => [...nds, newNode]);
+    }
+  };
+
+  // Function to update node data
+  const updateNodeData = (id: string, updates: Partial<Node['data']>) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === id
+          ? { ...node, data: { ...node.data, ...updates } }
+          : node
+      )
+    );
   };
 
   return (
@@ -60,6 +98,10 @@ const App: React.FC = () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
+        />
+        <LeftBar 
+          nodes={nodes}
+          updateNodeData={updateNodeData} 
         />
       </ReactFlowProvider>
     </div>
