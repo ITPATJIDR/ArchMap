@@ -89,6 +89,14 @@ pub async fn get_docker_config_by_name(service_name: &str) -> Result<String, Str
             serde_json::to_string(&service_config)
                 .map_err(|err| format!("Failed to serialize service config: {}", err))
         }
-        None => Ok(format!("Service '{}' not found in the configuration", service_name)),
+        None => {
+            let default_service_config = serde_json::json!({
+                "ports": ["8000:8000"],
+                "restart": "always",
+            });
+
+            serde_json::to_string(&default_service_config)
+                .map_err(|err| format!("Failed to serialize default service config: {}", err))
+        }
     }
 }

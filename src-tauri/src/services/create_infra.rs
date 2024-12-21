@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use crate::templates::service_configs_manager::ServiceConfig;
 use crate::utils::ansible::ansible_managers::run_ansible_command;
 use crate::templates::playbook_manager::PlaybookManager;
 
@@ -10,6 +11,7 @@ pub struct Service {
     pub label: String,
     pub name: String,
     pub service_type: String,
+    pub config: Option<ServiceConfig>,
 }
 
 

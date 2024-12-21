@@ -55,7 +55,7 @@ const App: React.FC = () => {
           image,
           name: name,
           service_type: service,
-          config: JSON.parse(result)
+          config: JSON.parse(result) || {}
         }, // Pass the image URL
       };
       setNodes((nds) => [...nds, newNode]);

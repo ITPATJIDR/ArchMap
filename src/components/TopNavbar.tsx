@@ -5,6 +5,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import {
   Node,
 } from '@xyflow/react';
+import { DockerComposeNodeConfig } from './LeftBar';
 
 interface TopBarProps {
   nodes: Node[];
@@ -14,6 +15,7 @@ interface NodeData {
   label: string | unknown
   name: string | unknown
   service_type: string | unknown
+  config? : DockerComposeNodeConfig | unknown
 }
 
 const TopNavbar: React.FC<TopBarProps> = ({nodes}) => {
@@ -30,12 +32,13 @@ const TopNavbar: React.FC<TopBarProps> = ({nodes}) => {
 
   const handleCreate = async () => {
     const extract_service = (nodes.map((item: Node) => {
-        const new_data: NodeData = {
-            label: item.data.label,
-            name: item.data.name,
-            service_type: item.data.service_type,
-        }
-        return new_data
+      const new_data: NodeData = {
+          label: item.data.label,
+          name: item.data.name,
+          service_type: item.data.service_type,
+          config: JSON.stringify(item.data.config)
+      }
+      return new_data
     }))
 
     if (path && extract_service) {

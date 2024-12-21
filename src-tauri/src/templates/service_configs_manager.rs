@@ -10,7 +10,6 @@ pub struct ServiceConfig {
     command: Option<Vec<String>>,
 }
 
-
 #[derive(Debug)]
 pub struct ServiceConfigManager {
     configs: HashMap<String, ServiceConfig>,

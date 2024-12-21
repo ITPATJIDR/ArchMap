@@ -6,15 +6,15 @@ interface LeftBarProps {
 	updateNodeData: (id: string, updates: Partial<Node['data']>) => void;
 }
 
-interface DockerComposeNodeConfig  {
-	image: string;
-	ports: string[];
-	environment: string[] | null;
-	volumes: string[];
-	command: string | null;
+export interface DockerComposeNodeConfig  {
+	image?: string;
+	ports?: string[];
+	environment?: string[] | null;
+	volumes?: string[];
+	command?: string | null;
 }
 
-interface NodeData {
+export interface NodeData {
 	label?: string;
 	image?: string;
 	name?: string;
@@ -64,61 +64,23 @@ const LeftBar: React.FC<LeftBarProps> = ({ nodes, updateNodeData }) => {
 								{data.config ?
 								(
 									<div>
-										<div className="mt-1">
-												<div>
-													<strong>Command</strong>
+										{Object.entries(data.config).map(([key, value]: [string, any]) => {
+											return (
+												<div key={key}>
+													<div className="mt-1">
+														<div>
+															<strong>{key}</strong>
+														</div>
+														<input
+															type="text"
+															placeholder="Command"
+															value={value || ''}
+															className="border p-1 w-full mt-2 rounded-lg"
+														/>
+													</div>
 												</div>
-												<input
-													type="text"
-													placeholder="Command"
-													value={data.config.command || ''}
-													className="border p-1 w-full mt-2 rounded-lg"
-												/>
-										</div>
-										<div className="mt-1">
-												<div>
-													<strong>Environment</strong>
-												</div>
-												<input
-													type="text"
-													placeholder="Environment"
-													value={data.config.environment || ''}
-													className="border p-1 w-full mt-2 rounded-lg"
-												/>
-										</div>
-										<div className="mt-1">
-												<div>
-													<strong>Image</strong>
-												</div>
-												<input
-													type="text"
-													placeholder="Image"
-													value={data.config.image || ''}
-													className="border p-1 w-full mt-2 rounded-lg"
-												/>
-										</div>
-										<div className="mt-1">
-												<div>
-													<strong>Ports</strong>
-												</div>
-												<input
-													type="text"
-													placeholder="Ports"
-													value={data.config.ports || ''}
-													className="border p-1 w-full mt-2 rounded-lg"
-												/>
-										</div>
-										<div className="mt-1">
-												<div>
-													<strong>Volumns</strong>
-												</div>
-												<input
-													type="text"
-													placeholder="Volumns"
-													value={data.config.volumes || ''}
-													className="border p-1 w-full mt-2 rounded-lg"
-												/>
-										</div>
+											);
+										})}
 									</div>
 								) 
 								: ""}
