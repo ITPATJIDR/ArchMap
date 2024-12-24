@@ -1,5 +1,5 @@
 ---
-- name: React Project Automation
+- name: React Project Automation with TypeScript
   hosts: localhost
   gather_facts: no
   vars:
@@ -18,23 +18,24 @@
         state: directory
       when: dir_check.stat.exists == false
 
-    - name: Check if the React project exists
+    - name: Check if the React TypeScript project exists
       stat:
         path: "{{ dirpath }}/{{ project_name }}"
       register: project_check
 
-    - name: Create React project if it doesn't exist
-      command: npx create-react-app {{ dirpath }}/{{ project_name }}
-      when: project_check.stat.exists == false
+    - name: Create React TypeScript project if it doesn't exist
+      command: npx create-react-app {{ project_name }} --template typescript
       args:
+        chdir: "{{ dirpath }}"
         creates: "{{ dirpath }}/{{ project_name }}/package.json"
+      when: project_check.stat.exists == false
 
     - name: Output project creation status
       debug:
-        msg: "React project {{ project_name }} is created at {{ dirpath }}"
+        msg: "React TypeScript project {{ project_name }} is created at {{ dirpath }}"
       when: project_check.stat.exists == false
 
     - name: Output message if project exists
       debug:
-        msg: "React project {{ project_name }} already exists at {{ dirpath }}"
+        msg: "React TypeScript project {{ project_name }} already exists at {{ dirpath }}"
       when: project_check.stat.exists == true

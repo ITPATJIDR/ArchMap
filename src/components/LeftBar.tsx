@@ -38,7 +38,6 @@ const LeftBar: React.FC<LeftBarProps> = ({ nodes, updateNodeData }) => {
 					{nodes.map((item: Node, index: number) => {
 						const id: string = item.id
 						const data = item.data as NodeData;
-						console.log(data)
 						return (
 							<div
 								key={index}
