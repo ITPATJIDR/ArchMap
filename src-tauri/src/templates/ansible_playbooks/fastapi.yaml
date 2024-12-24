@@ -1,0 +1,54 @@
+---
+- name: FastAPI Project Automation
+  hosts: localhost
+  gather_facts: no
+  vars:
+    dirpath: "{{ dirpath }}"
+    project_name: "{{ project_name }}"
+
+  tasks:
+    - name: Check if directory path exists
+      stat:
+        path: "{{ dirpath }}"
+      register: dir_check
+
+    - name: Create directory path if not exists
+      file:
+        path: "{{ dirpath }}"
+        state: directory
+      when: dir_check.stat.exists == false
+
+    - name: Check if the FastAPI project exists
+      stat:
+        path: "{{ dirpath }}/{{ project_name }}"
+      register: project_check
+
+    - name: Install FastAPI and Uvicorn if not installed
+      pip:
+        name:
+          - fastapi
+          - uvicorn
+        state: latest
+      when: project_check.stat.exists == false
+
+    - name: Create FastAPI project if it doesn't exist
+      copy:
+        content: |
+          from fastapi import FastAPI
+          app = FastAPI()
+
+          @app.get("/")
+          def read_root():
+              return {"Hello": "World"}
+        dest: "{{ dirpath }}/{{ project_name }}/main.py"
+      when: project_check.stat.exists == false
+
+    - name: Output project creation status
+      debug:
+        msg: "FastAPI project {{ project_name }} is created at {{ dirpath }}"
+      when: project_check.stat.exists == false
+
+    - name: Output message if project exists
+      debug:
+        msg: "FastAPI project {{ project_name }} already exists at {{ dirpath }}"
+      when: project_check.stat.exists == true

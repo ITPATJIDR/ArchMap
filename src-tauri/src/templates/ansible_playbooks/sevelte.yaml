@@ -1,0 +1,45 @@
+---
+- name: Svelte Project Automation with TypeScript
+  hosts: localhost
+  gather_facts: no
+  vars:
+    dirpath: "{{ dirpath }}"
+    project_name: "{{ project_name }}"
+
+  tasks:
+    - name: Check if directory path exists
+      stat:
+        path: "{{ dirpath }}"
+      register: dir_check
+
+    - name: Create directory path if not exists
+      file:
+        path: "{{ dirpath }}"
+        state: directory
+      when: dir_check.stat.exists == false
+
+    - name: Check if the Svelte project exists
+      stat:
+        path: "{{ dirpath }}/{{ project_name }}"
+      register: project_check
+
+    - name: Install degit if not installed
+      command: npm install -g degit
+      when: project_check.stat.exists == false
+
+    - name: Create Svelte project with TypeScript if it doesn't exist
+      command: npx degit sveltejs/template-typescript {{ project_name }}
+      args:
+        chdir: "{{ dirpath }}"
+        creates: "{{ dirpath }}/{{ project_name }}/tsconfig.json"
+      when: project_check.stat.exists == false
+
+    - name: Output project creation status
+      debug:
+        msg: "Svelte TypeScript project {{ project_name }} is created at {{ dirpath }}"
+      when: project_check.stat.exists == false
+
+    - name: Output message if project exists
+      debug:
+        msg: "Svelte TypeScript project {{ project_name }} already exists at {{ dirpath }}"
+      when: project_check.stat.exists == true

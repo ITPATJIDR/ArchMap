@@ -1,0 +1,41 @@
+---
+- name: Vue Project Automation with TypeScript
+  hosts: localhost
+  gather_facts: no
+  vars:
+    dirpath: "{{ dirpath }}"
+    project_name: "{{ project_name }}"
+
+  tasks:
+    - name: Check if directory path exists
+      stat:
+        path: "{{ dirpath }}"
+      register: dir_check
+
+    - name: Create directory path if not exists
+      file:
+        path: "{{ dirpath }}"
+        state: directory
+      when: dir_check.stat.exists == false
+
+    - name: Check if the Vue TypeScript project exists
+      stat:
+        path: "{{ dirpath }}/{{ project_name }}"
+      register: project_check
+
+    - name: Create Vue TypeScript project if it doesn't exist
+      command: npm create vue@latest {{ project_name }} -- --template vue-ts
+      args:
+        chdir: "{{ dirpath }}"
+        creates: "{{ dirpath }}/{{ project_name }}/package.json"
+      when: project_check.stat.exists == false
+
+    - name: Output project creation status
+      debug:
+        msg: "Vue TypeScript project {{ project_name }} is created at {{ dirpath }}"
+      when: project_check.stat.exists == false
+
+    - name: Output message if project exists
+      debug:
+        msg: "Vue TypeScript project {{ project_name }} already exists at {{ dirpath }}"
+      when: project_check.stat.exists == true

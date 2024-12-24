@@ -40,7 +40,39 @@ const RightNavbar: React.FC<RightNavbarProps> = ({ addNode }) => {
 		},
 		{
 			name: "Gin",
-			icons: "https://seeklogo.com/images/G/gin-logo-BD71D14076-seeklogo.com.png"
+			icons: "https://avatars.githubusercontent.com/u/15729372?s=280&v=4"
+		},
+		{
+			name: "Elysia",
+			icons: "https://elysiajs.com/assets/elysia.svg"
+		},
+		{
+			name: "Vue",
+			icons: "https://static-00.iconduck.com/assets.00/vue-icon-2048x1766-ntogpmti.png"
+		},
+		{
+			name: "Angular",
+			icons: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Angular_full_color_logo.svg/2048px-Angular_full_color_logo.svg.png"
+		},
+		{
+			name: "Svelte",
+			icons: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Angular_full_color_logo.svg/2048px-Angular_full_color_logo.svg.png"
+		},
+		{
+			name: "Next",
+			icons: "https://static-00.iconduck.com/assets.00/nextjs-icon-1024x1024-5et230l7.png"
+		},
+		{
+			name: "Nuxt",
+			icons: "https://nuxt.com/assets/design-kit/icon-green.svg"
+		},
+		{
+			name: "Django",
+			icons: "https://www.svgrepo.com/show/353657/django-icon.svg"
+		},
+		{
+			name: "FastAPI",
+			icons: "https://cdn.worldvectorlogo.com/logos/fastapi.svg"
 		},
 	];
 

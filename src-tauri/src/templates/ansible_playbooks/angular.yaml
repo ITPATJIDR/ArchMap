@@ -1,0 +1,45 @@
+---
+- name: Angular Project Automation with TypeScript
+  hosts: localhost
+  gather_facts: no
+  vars:
+    dirpath: "{{ dirpath }}"
+    project_name: "{{ project_name }}"
+
+  tasks:
+    - name: Check if directory path exists
+      stat:
+        path: "{{ dirpath }}"
+      register: dir_check
+
+    - name: Create directory path if not exists
+      file:
+        path: "{{ dirpath }}"
+        state: directory
+      when: dir_check.stat.exists == false
+
+    - name: Check if the Angular project exists
+      stat:
+        path: "{{ dirpath }}/{{ project_name }}"
+      register: project_check
+
+    - name: Install Angular CLI if not installed
+      command: npm install -g @angular/cli
+      when: project_check.stat.exists == false
+
+    - name: Create Angular project with TypeScript if it doesn't exist
+      command: ng new {{ project_name }} --defaults --skip-install
+      args:
+        chdir: "{{ dirpath }}"
+        creates: "{{ dirpath }}/{{ project_name }}/angular.json"
+      when: project_check.stat.exists == false
+
+    - name: Output project creation status
+      debug:
+        msg: "Angular project {{ project_name }} is created at {{ dirpath }}"
+      when: project_check.stat.exists == false
+
+    - name: Output message if project exists
+      debug:
+        msg: "Angular project {{ project_name }} already exists at {{ dirpath }}"
+      when: project_check.stat.exists == true

@@ -1,0 +1,74 @@
+---
+- name: Go Gin Service Automation
+  hosts: localhost
+  gather_facts: no
+  vars:
+    dirpath: "{{ dirpath }}"
+    project_name: "{{ project_name }}"
+
+  tasks:
+    - name: Check if directory path exists
+      stat:
+        path: "{{ dirpath }}"
+      register: dir_check
+
+    - name: Create directory path if not exists
+      file:
+        path: "{{ dirpath }}"
+        state: directory
+      when: dir_check.stat.exists == false
+
+    - name: Check if the Go Gin service project exists
+      stat:
+        path: "{{ dirpath }}/{{ project_name }}"
+      register: project_check
+
+    - name: Create Go Gin service project if it doesn't exist
+      block:
+        - name: Create project directory
+          file:
+            path: "{{ dirpath }}/{{ project_name }}"
+            state: directory
+
+        - name: Initialize Go module
+          command: go mod init {{ project_name }}
+          args:
+            chdir: "{{ dirpath }}/{{ project_name }}"
+
+        - name: Install Gin dependency
+          command: go get -u github.com/gin-gonic/gin
+          args:
+            chdir: "{{ dirpath }}/{{ project_name }}"
+
+        - name: Create main.go file
+          copy:
+            dest: "{{ dirpath }}/{{ project_name }}/main.go"
+            content: |
+              package main
+
+              import (
+                  "github.com/gin-gonic/gin"
+              )
+
+              func main() {
+                  r := gin.Default()
+                  r.GET("/ping", func(c *gin.Context) {
+                      c.JSON(200, gin.H{
+                          "message": "pong",
+                      })
+                  })
+                  r.Run(":8080")
+              }
+          mode: '0644'
+
+      when: project_check.stat.exists == false
+
+    - name: Output project creation status
+      debug:
+        msg: "Go Gin service project {{ project_name }} is created at {{ dirpath }}"
+      when: project_check.stat.exists == false
+
+    - name: Output message if project exists
+      debug:
+        msg: "Go Gin service project {{ project_name }} already exists at {{ dirpath }}"
+      when: project_check.stat.exists == true

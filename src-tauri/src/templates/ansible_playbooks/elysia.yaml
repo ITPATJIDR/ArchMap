@@ -1,0 +1,41 @@
+---
+- name: Elysia Service Automation with TypeScript
+  hosts: localhost
+  gather_facts: no
+  vars:
+    dirpath: "{{ dirpath }}"
+    service_name: "{{ service_name }}"
+
+  tasks:
+    - name: Check if directory path exists
+      stat:
+        path: "{{ dirpath }}"
+      register: dir_check
+
+    - name: Create directory path if not exists
+      file:
+        path: "{{ dirpath }}"
+        state: directory
+      when: dir_check.stat.exists == false
+
+    - name: Check if the Elysia service exists
+      stat:
+        path: "{{ dirpath }}/{{ service_name }}"
+      register: service_check
+
+    - name: Create Elysia service if it doesn't exist
+      command: npx elysia init {{ service_name }}
+      args:
+        chdir: "{{ dirpath }}"
+        creates: "{{ dirpath }}/{{ service_name }}/package.json"
+      when: service_check.stat.exists == false
+
+    - name: Output service creation status
+      debug:
+        msg: "Elysia service {{ service_name }} is created at {{ dirpath }}"
+      when: service_check.stat.exists == false
+
+    - name: Output message if service exists
+      debug:
+        msg: "Elysia service {{ service_name }} already exists at {{ dirpath }}"
+      when: service_check.stat.exists == true

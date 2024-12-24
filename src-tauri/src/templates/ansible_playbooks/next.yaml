@@ -1,0 +1,45 @@
+---
+- name: Next.js Project Automation with TypeScript
+  hosts: localhost
+  gather_facts: no
+  vars:
+    dirpath: "{{ dirpath }}"
+    project_name: "{{ project_name }}"
+
+  tasks:
+    - name: Check if directory path exists
+      stat:
+        path: "{{ dirpath }}"
+      register: dir_check
+
+    - name: Create directory path if not exists
+      file:
+        path: "{{ dirpath }}"
+        state: directory
+      when: dir_check.stat.exists == false
+
+    - name: Check if the Next.js project exists
+      stat:
+        path: "{{ dirpath }}/{{ project_name }}"
+      register: project_check
+
+    - name: Install Next.js if not installed
+      command: npm install -g create-next-app
+      when: project_check.stat.exists == false
+
+    - name: Create Next.js project with TypeScript if it doesn't exist
+      command: npx create-next-app@latest {{ project_name }} --typescript
+      args:
+        chdir: "{{ dirpath }}"
+        creates: "{{ dirpath }}/{{ project_name }}/tsconfig.json"
+      when: project_check.stat.exists == false
+
+    - name: Output project creation status
+      debug:
+        msg: "Next.js TypeScript project {{ project_name }} is created at {{ dirpath }}"
+      when: project_check.stat.exists == false
+
+    - name: Output message if project exists
+      debug:
+        msg: "Next.js TypeScript project {{ project_name }} already exists at {{ dirpath }}"
+      when: project_check.stat.exists == true
