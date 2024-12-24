@@ -18,6 +18,14 @@ ArchMap supports the following web services:
   <li><strong>React</strong></li>
   <li><strong>Express</strong></li>
   <li><strong>Gin</strong></li>
+  <li><strong>Elysia</strong></li>
+  <li><strong>Vue</strong></li>
+  <li><strong>Angular</strong></li>
+  <li><strong>Svelte</strong></li>
+  <li><strong>Next</strong></li>
+  <li><strong>Nuxt</strong></li>
+  <li><strong>Django</strong></li>
+  <li><strong>FastAPI</strong></li>
 </ul>
 
 ## Docker-Compose Support

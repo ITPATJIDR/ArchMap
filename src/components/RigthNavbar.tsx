@@ -28,6 +28,7 @@ const RightNavbar: React.FC<RightNavbarProps> = ({ addNode }) => {
 	const [repositories, setRepositories] = useState<string[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [searchTerm, setSearchTerm] = useState<string>("");
+	console.log(loading)
 
 	const icon_list: IconList = [
 		{
